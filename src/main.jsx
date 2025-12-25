@@ -15,6 +15,7 @@ import Line from "./dashboard/pages/Charts/Line";
 import Area from "./dashboard/pages/Charts/Area";
 import Bar from "./dashboard/pages/Charts/Bar";
 import Pie from "./dashboard/pages/Charts/Pie";
+import ReservationsStats from "./dashboard/pages/ReservationsStats"; // New Import
 import AdminRoute from "./routes/AdminRoute";
 import PaymentSuccess from "./pages/PaymentSuccess";
 import PaymentCancel from "./pages/PaymentCancel";
@@ -57,6 +58,7 @@ ReactDOM.render(
           <Route path="area" element={<Area />} />
           <Route path="bar" element={<Bar />} />
           <Route path="pie" element={<Pie />} />
+          <Route path="reservations" element={<ReservationsStats />} />
         </Route>
       </Routes>
     </BrowserRouter>

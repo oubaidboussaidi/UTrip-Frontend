@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
-import { Calendar, MapPin, Plus, Edit, Trash2, Search, ChevronLeft, ChevronRight, Filter } from "lucide-react";
+import { Calendar, MapPin, Plus, Edit, Trash2, Search, ChevronLeft, ChevronRight, Filter, TrendingUp, Users } from "lucide-react";
 import { getMyEvents } from "../api/apiEvent";
+import apiTicket from "../api/apiTicket";
 import Navbar from "../components/NavBar";
 import { useNavigate } from "react-router-dom";
 import CreateEventModal from "../components/CreateEventModal";
@@ -10,6 +11,7 @@ const ITEMS_PER_PAGE = 9;
 
 const MyEvents = () => {
     const [events, setEvents] = useState([]);
+    const [stats, setStats] = useState(null);
     const [loading, setLoading] = useState(true);
     const [currentPage, setCurrentPage] = useState(1);
     const [searchTerm, setSearchTerm] = useState("");
@@ -24,16 +26,22 @@ const MyEvents = () => {
             navigate("/");
             return;
         }
-        fetchEvents();
+        fetchData();
     }, []);
 
-    const fetchEvents = async () => {
+    const fetchData = async () => {
         setLoading(true);
         try {
-            const { data } = await getMyEvents(user.email);
-            setEvents(data);
+            // Fetch Events
+            const { data: eventsData } = await getMyEvents(user.email);
+            setEvents(eventsData);
+
+            // Fetch Analytics
+            const { data: statsData } = await apiTicket.getOrganizerAnalytics(user.email);
+            setStats(statsData);
+
         } catch (error) {
-            console.error("Error fetching events:", error);
+            console.error("Error fetching data:", error);
         } finally {
             setLoading(false);
         }
@@ -41,7 +49,7 @@ const MyEvents = () => {
 
     const handleModalClose = () => {
         setShowCreateModal(false);
-        fetchEvents(); // Refresh events after modal closes
+        fetchData(); // Refresh events after modal closes
     };
 
     // Filter events
@@ -68,7 +76,7 @@ const MyEvents = () => {
 
             <div className="pt-32 px-5 md:px-20 max-w-7xl mx-auto pb-20">
                 {/* Header Section */}
-                <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-12">
+                <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-8">
                     <div>
                         <h1 className="text-4xl font-bold text-gray-900 mb-2">My Events</h1>
                         <p className="text-gray-500">Manage and track your organized events</p>
@@ -82,6 +90,32 @@ const MyEvents = () => {
                         Create Event
                     </button>
                 </div>
+
+                {/* STATS SECTION */}
+                {stats && (
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-10">
+                        <div className="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 flex items-center gap-4">
+                            <div className="p-4 bg-green-50 text-green-600 rounded-2xl">
+                                <TrendingUp className="w-8 h-8" />
+                            </div>
+                            <div>
+                                <p className="text-gray-500 font-medium">Total Revenue</p>
+                                <h3 className="text-3xl font-bold text-gray-900">
+                                    {stats.totalRevenue.toLocaleString('fr-FR', { style: 'currency', currency: 'EUR' })}
+                                </h3>
+                            </div>
+                        </div>
+                        <div className="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 flex items-center gap-4">
+                            <div className="p-4 bg-blue-50 text-blue-600 rounded-2xl">
+                                <Users className="w-8 h-8" />
+                            </div>
+                            <div>
+                                <p className="text-gray-500 font-medium">Total Reservations</p>
+                                <h3 className="text-3xl font-bold text-gray-900">{stats.totalReservations}</h3>
+                            </div>
+                        </div>
+                    </div>
+                )}
 
                 {/* Search and Filter Bar */}
                 <div className="bg-white p-4 rounded-3xl shadow-sm border border-gray-100 mb-10 flex flex-col md:flex-row gap-4 items-center">
@@ -134,7 +168,7 @@ const MyEvents = () => {
                                     <div className="px-2">
                                         <h3 className="text-xl font-bold text-gray-900 mb-2 line-clamp-1">{event.title}</h3>
 
-                                        <div className="space-y-2 mb-6">
+                                        <div className="space-y-2 mb-4">
                                             <div className="flex items-center gap-2 text-gray-500 text-sm">
                                                 <Calendar className="w-4 h-4" />
                                                 <span>{event.date}</span>
@@ -144,6 +178,24 @@ const MyEvents = () => {
                                                 <span className="line-clamp-1">{event.location}</span>
                                             </div>
                                         </div>
+
+                                        {/* EVENT ANALYTICS MINI-DASHBOARD */}
+                                        {stats && (
+                                            <div className="flex gap-2 mb-4 p-3 bg-gray-50 rounded-xl">
+                                                <div className="flex-1 text-center border-r border-gray-200">
+                                                    <p className="text-xs text-gray-500 uppercase font-bold">Sold</p>
+                                                    <p className="font-bold text-gray-900">
+                                                        {stats.reservationsPerEvent?.[event.title] || 0}
+                                                    </p>
+                                                </div>
+                                                <div className="flex-1 text-center">
+                                                    <p className="text-xs text-gray-500 uppercase font-bold">Revenue</p>
+                                                    <p className="font-bold text-green-600">
+                                                        {(stats.revenuePerEvent?.[event.title] || 0).toLocaleString('fr-FR', { style: 'currency', currency: 'EUR', minimumFractionDigits: 0 })}
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        )}
 
                                         <div className="flex gap-2 pt-4 border-t border-gray-100">
                                             <button className="flex-1 py-2.5 bg-gray-50 text-gray-900 rounded-xl text-sm font-semibold hover:bg-gray-100 transition-colors flex items-center justify-center gap-2">
