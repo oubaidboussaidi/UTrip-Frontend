@@ -60,11 +60,13 @@ const NavBar = () => {
     localStorage.removeItem("user");
     localStorage.removeItem("token");
     window.dispatchEvent(new Event("userChanged"));
-    setUser(null);
-    setShowDropdown(false);
+
+    // Redirect to home and force a page reload
+    window.location.href = "/";
   };
 
   const isOrganizer = user?.role === "ORGANIZER";
+  const isAdmin = user?.role === "ADMIN";
 
   // Get user initials for avatar
   const getUserInitials = () => {
@@ -81,37 +83,75 @@ const NavBar = () => {
           position: relative;
         }
 
-        .user-btn {
+        .dashboard-nav-link {
           display: flex;
           align-items: center;
           gap: 0.5rem;
-          padding: 0.5rem 1rem;
-          background: white;
-          border: 1px solid #e5e7eb;
+          padding: 0.6rem 1.25rem;
+          background: #f3f4f6;
           border-radius: 9999px;
-          font-weight: 500;
-          color: #374151;
+          color: #111827;
+          font-weight: 700;
+          font-size: 0.875rem;
+          transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+          border: 1px solid transparent;
+          text-decoration: none;
+        }
+
+        .dashboard-nav-link:hover {
+          background: #000;
+          color: #fff;
+          transform: translateY(-2px);
+          box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+
+        .dashboard-nav-link.admin {
+          background: #fef2f2;
+          color: #991b1b;
+        }
+
+        .dashboard-nav-link.admin:hover {
+          background: #991b1b;
+          color: #fff;
+        }
+
+        .user-btn {
+          display: flex;
+          align-items: center;
+          gap: 0.6rem;
+          padding: 0.4rem 1rem 0.4rem 0.6rem;
+          background: rgba(255, 255, 255, 0.8);
+          backdrop-filter: blur(8px);
+          border: 1px solid rgba(0, 0, 0, 0.05);
+          border-radius: 9999px;
+          font-weight: 700;
+          color: #1a1a1a;
           cursor: pointer;
-          transition: all 0.3s ease;
+          transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+          box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
         }
 
         .user-btn:hover {
-          border-color: #d1d5db;
-          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+          background: #fff;
+          border-color: #3b82f6;
+          box-shadow: 0 10px 15px -3px rgba(59, 130, 246, 0.15);
           transform: translateY(-2px);
         }
 
         .user-avatar {
-          width: 32px;
-          height: 32px;
+          width: 38px;
+          height: 38px;
           border-radius: 50%;
-          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+          background: linear-gradient(135deg, #2563eb 0%, #3b82f6 100%);
           display: flex;
           align-items: center;
           justify-content: center;
           color: white;
-          font-weight: 600;
-          font-size: 0.875rem;
+          font-weight: 800;
+          font-size: 0.8rem;
+          letter-spacing: -0.02em;
+          border: 2px solid white;
+          box-shadow: 0 2px 8px rgba(37, 99, 235, 0.3);
         }
 
         .dropdown-menu {
@@ -236,84 +276,73 @@ const NavBar = () => {
             </ul>
           </nav>
 
-          {!user ? (
-            <a
-              href="#login"
-              className="contact-btn group"
-              onClick={(e) => {
-                e.preventDefault();
-                setShowLogin(true);
-              }}
-            >
-              <div className="inner">
-                <span>Login / Signup</span>
-              </div>
-            </a>
-          ) : (
-            <div className="user-menu" ref={dropdownRef}>
-              <button className="user-btn" onClick={() => setShowDropdown((prev) => !prev)}>
-                <div className="user-avatar">{getUserInitials()}</div>
-                <span>{user.firstName || "User"}</span>
-                <ChevronDown className="chevron-icon" size={16} />
-              </button>
+          <div className="flex items-center gap-4">
+            {(isAdmin || isOrganizer) && (
+              <a
+                href={isAdmin ? "/dashboard" : "/organizer-dashboard"}
+                className={`dashboard-nav-link ${isAdmin ? 'admin' : ''}`}
+              >
+                <LayoutDashboard size={18} />
+                <span>Dashboard</span>
+              </a>
+            )}
 
-              {showDropdown && (
-                <div className="dropdown-menu">
-                  <button
-                    className="dropdown-item"
-                    onClick={() => {
-                      setShowProfile(true);
-                      setShowDropdown(false);
-                    }}
-                  >
-                    <User size={18} />
-                    <span>Profile</span>
-                  </button>
+            {!user ? (
+              <a
+                href="#login"
+                className="contact-btn group"
+                onClick={(e) => {
+                  e.preventDefault();
+                  setShowLogin(true);
+                }}
+              >
+                <div className="inner">
+                  <span>Login / Signup</span>
+                </div>
+              </a>
+            ) : (
+              <div className="user-menu" ref={dropdownRef}>
+                <button className="user-btn" onClick={() => setShowDropdown((prev) => !prev)}>
+                  <div className="user-avatar">{getUserInitials()}</div>
+                  <span>{user.firstName || "User"}</span>
+                  <ChevronDown className="chevron-icon" size={16} />
+                </button>
 
-                  <button
-                    className="dropdown-item"
-                    onClick={() => {
-                      window.location.href = "/my-tickets";
-                      setShowDropdown(false);
-                    }}
-                  >
-                    <Ticket size={18} />
-                    <span>My Tickets</span>
-                  </button>
-
-                  {isOrganizer && (
+                {showDropdown && (
+                  <div className="dropdown-menu">
                     <button
-                      className="dropdown-item organizer"
+                      className="dropdown-item"
                       onClick={() => {
-                        window.location.href = "/my-events";
+                        setShowProfile(true);
                         setShowDropdown(false);
                       }}
                     >
-                      <Calendar size={18} />
-                      <span>My Events</span>
+                      <User size={18} />
+                      <span>Profile</span>
                     </button>
-                  )}
 
-                  {user?.role === "ADMIN" && (
                     <button
-                      className="dropdown-item admin"
-                      onClick={() => (window.location.href = "/dashboard")}
+                      className="dropdown-item"
+                      onClick={() => {
+                        window.location.href = "/my-tickets";
+                        setShowDropdown(false);
+                      }}
                     >
-                      <LayoutDashboard size={18} />
-                      <span>Dashboard</span>
+                      <Ticket size={18} />
+                      <span>My Tickets</span>
                     </button>
-                  )}
 
-                  <div className="dropdown-divider"></div>
+                    <div className="dropdown-divider"></div>
 
-                  <button className="dropdown-item logout" onClick={handleLogout}>
-                    <LogOut size={18} />
-                    <span>Disconnect</span>
-                  </button>
-                </div>
-              )}
-            </div>
-          )}
+                    <button className="dropdown-item logout" onClick={handleLogout}>
+                      <LogOut size={18} />
+                      <span>Disconnect</span>
+                    </button>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
         </div>
       </header>
 
