@@ -1,17 +1,32 @@
 import React, { useState } from "react";
 import { createPortal } from "react-dom";
-import { MapPin, Calendar, Tag, DollarSign, X, Minus, Plus, CreditCard, Clock, Info } from "lucide-react";
+import { MapPin, Calendar, Tag, DollarSign, X, Minus, Plus, CreditCard, Clock, Info, Users } from "lucide-react";
 import apiPayment from "../api/apiPayment";
+import { getTicketTypesByEvent } from "../api/apiTicket";
 import toast from "react-hot-toast";
 
 const EventDetailsModal = ({ event, onClose }) => {
   const [quantity, setQuantity] = useState(1);
   const [loading, setLoading] = useState(false);
+  const [ticketTypes, setTicketTypes] = useState([]);
+  const [selectedTicketType, setSelectedTicketType] = useState(null);
+
+  React.useEffect(() => {
+    if (event?.id) {
+      getTicketTypesByEvent(event.id).then(({ data }) => {
+        // Filter out types with 0 quantity if desired, or show as sold out
+        setTicketTypes(data);
+        if (data.length > 0) setSelectedTicketType(data[0]);
+      }).catch(console.error);
+    }
+  }, [event]);
 
   if (!event) return null;
 
   const handleIncrease = () => {
-    if (quantity < event.nbPlace) {
+    // Check limit based on selected ticket type
+    const limit = selectedTicketType ? selectedTicketType.remainingQuantity : event.nbPlace;
+    if (quantity < limit) {
       setQuantity(prev => prev + 1);
     }
   };
@@ -29,12 +44,18 @@ const EventDetailsModal = ({ event, onClose }) => {
       return;
     }
 
+    if (ticketTypes.length > 0 && !selectedTicketType) {
+      toast.error("Please select a ticket type");
+      return;
+    }
+
     setLoading(true);
     try {
       const { data } = await apiPayment.createCheckoutSession({
         eventId: event.id,
         email: user.email,
         quantity: quantity,
+        ticketTypeId: selectedTicketType?.id, // Send ticketTypeId
         origin: window.location.origin
       });
 
@@ -48,6 +69,9 @@ const EventDetailsModal = ({ event, onClose }) => {
       setLoading(false);
     }
   };
+
+  const currentPrice = selectedTicketType ? selectedTicketType.price : event.price;
+  const currentStock = selectedTicketType ? selectedTicketType.remainingQuantity : event.nbPlace;
 
   return createPortal(
     <>
@@ -294,7 +318,19 @@ const EventDetailsModal = ({ event, onClose }) => {
                     <div>
                       <p className="text-sm font-medium text-gray-500">Status</p>
                       <p className="text-lg font-semibold text-gray-900">
-                        {event.nbPlace > 0 ? "Available" : "Sold Out"}
+                        {currentStock > 0 ? "Available" : "Sold Out"}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="info-item">
+                    <div className="p-3 bg-blue-50 rounded-xl text-blue-600">
+                      <Users className="w-6 h-6" />
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium text-gray-500">Capacity</p>
+                      <p className="text-lg font-semibold text-gray-900">
+                        {event.nbPlace} Places
                       </p>
                     </div>
                   </div>
@@ -305,11 +341,34 @@ const EventDetailsModal = ({ event, onClose }) => {
             {/* Right Column: Booking */}
             <div className="right-column">
               <div className="booking-card">
+
+                {/* Ticket Types Selector */}
+                {ticketTypes.length > 0 && (
+                  <div className="mb-4">
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Select Ticket Type</label>
+                    <select
+                      value={selectedTicketType?.id || ""}
+                      onChange={(e) => {
+                        const type = ticketTypes.find(t => t.id === e.target.value);
+                        setSelectedTicketType(type);
+                        setQuantity(1);
+                      }}
+                      className="w-full p-3 border border-gray-200 rounded-xl bg-gray-50 mb-3"
+                    >
+                      {ticketTypes.map(type => (
+                        <option key={type.id} value={type.id}>
+                          {type.name} - {type.price} TND ({type.remainingQuantity} left)
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                )}
+
                 <div className="flex justify-between items-start mb-6">
                   <div>
                     <p className="text-sm text-gray-500 font-medium">Price per ticket</p>
                     <h3 className="text-4xl font-bold text-gray-900 mt-1">
-                      {event.price} <span className="text-lg text-gray-500 font-normal">TND</span>
+                      {currentPrice} <span className="text-lg text-gray-500 font-normal">TND</span>
                     </h3>
                   </div>
                   <div className="bg-green-100 text-green-700 px-3 py-1 rounded-full text-sm font-semibold">
@@ -326,26 +385,26 @@ const EventDetailsModal = ({ event, onClose }) => {
                         disabled={quantity <= 1}
                         className="w-10 h-10 flex items-center justify-center rounded-lg bg-white border border-gray-200 hover:bg-gray-100 disabled:opacity-50 transition-colors"
                       >
-                        <Minus className="w-4 h-4" style={{color:"#000"}}/>
+                        <Minus className="w-4 h-4" style={{ color: "#000" }} />
                       </button>
                       <span className="text-xl font-bold text-gray-900">{quantity}</span>
                       <button
                         onClick={handleIncrease}
-                        disabled={quantity >= event.nbPlace}
+                        disabled={quantity >= currentStock}
                         className="w-10 h-10 flex items-center justify-center rounded-lg bg-white border border-gray-200 hover:bg-gray-100 disabled:opacity-50 transition-colors"
                       >
-                        <Plus className="w-4 h-4"  style={{color:"#000"}}/>
+                        <Plus className="w-4 h-4" style={{ color: "#000" }} />
                       </button>
                     </div>
                     <p className="text-xs text-gray-500 mt-2 text-right">
-                      {event.nbPlace} tickets remaining
+                      {currentStock} tickets remaining
                     </p>
                   </div>
 
                   <div className="border-t border-gray-100 pt-4 space-y-2">
                     <div className="flex justify-between text-gray-600">
-                      <span>{event.price} TND x {quantity}</span>
-                      <span>{(event.price * quantity).toFixed(2)} TND</span>
+                      <span>{currentPrice} TND x {quantity}</span>
+                      <span>{(currentPrice * quantity).toFixed(2)} TND</span>
                     </div>
                     <div className="flex justify-between text-gray-600">
                       <span>Service Fee</span>
@@ -353,13 +412,13 @@ const EventDetailsModal = ({ event, onClose }) => {
                     </div>
                     <div className="flex justify-between text-xl font-bold text-gray-900 pt-2 border-t border-gray-100">
                       <span>Total</span>
-                      <span>{(event.price * quantity).toFixed(2)} TND</span>
+                      <span>{(currentPrice * quantity).toFixed(2)} TND</span>
                     </div>
                   </div>
 
                   <button
                     onClick={handleBooking}
-                    disabled={loading || event.nbPlace === 0}
+                    disabled={loading || currentStock === 0}
                     className="w-full py-4 bg-gray-900 hover:bg-black text-white rounded-xl font-bold text-lg shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-3"
                   >
                     {loading ? (
@@ -378,6 +437,7 @@ const EventDetailsModal = ({ event, onClose }) => {
                 </div>
               </div>
             </div>
+
           </div>
         </div>
       </div>

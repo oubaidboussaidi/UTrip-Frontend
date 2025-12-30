@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { createPortal } from "react-dom";
 import { X, Heart, ChevronLeft, ChevronRight } from "lucide-react";
 import apiPublic from "../api/apiPublic";
+import { searchEvents } from "../api/apiEvent";
 import EventDetailsModal from "./EventDetailsModal";
 
 const AllEventsModal = ({ onClose, userFavs, toggleFavorite }) => {
@@ -15,13 +16,27 @@ const AllEventsModal = ({ onClose, userFavs, toggleFavorite }) => {
     fetchAllEvents();
   }, []);
 
-  const fetchAllEvents = async () => {
+  const fetchAllEvents = async (searchParams = {}) => {
     try {
-      const { data } = await apiPublic.get("/events/approved");
-      setAllEvents(Array.isArray(data) ? data : []);
+      // If we have search inputs, use search endpoint
+      if (searchParams.location || searchParams.date || searchParams.category) {
+        const { data } = await searchEvents(searchParams);
+        setAllEvents(Array.isArray(data) ? data : []);
+      } else {
+        const { data } = await apiPublic.get("/events/approved");
+        setAllEvents(Array.isArray(data) ? data : []);
+      }
+      setCurrentPage(1);
     } catch (e) {
       console.error("Error fetching all events", e);
     }
+  };
+
+  const [search, setSearch] = useState({ location: "", date: "", category: "" });
+
+  const handleSearch = (e) => {
+    e.preventDefault();
+    fetchAllEvents(search);
   };
 
   const filteredEvents = showFavOnly
@@ -268,6 +283,42 @@ const AllEventsModal = ({ onClose, userFavs, toggleFavorite }) => {
           </button>
         </div>
 
+        {/* Search Form */}
+        <form onSubmit={handleSearch} className="mb-6 flex flex-wrap gap-4">
+          <input
+            type="text"
+            placeholder="Location"
+            value={search.location}
+            onChange={(e) => setSearch({ ...search, location: e.target.value })}
+            className="px-4 py-2 border rounded-xl flex-1 min-w-[150px]"
+          />
+          <input
+            type="date"
+            value={search.date}
+            onChange={(e) => setSearch({ ...search, date: e.target.value })}
+            className="px-4 py-2 border rounded-xl flex-1 min-w-[150px]"
+          />
+          <select
+            value={search.category}
+            onChange={(e) => setSearch({ ...search, category: e.target.value })}
+            className="px-4 py-2 border rounded-xl flex-1 min-w-[150px]"
+          >
+            <option value="">All Categories</option>
+            <option value="Cultural">Cultural</option>
+            <option value="Adventure">Adventure</option>
+            <option value="Music">Music</option>
+            <option value="Sports">Sports</option>
+            <option value="Food & Drink">Food & Drink</option>
+            <option value="Technology">Technology</option>
+            <option value="Art">Art</option>
+            <option value="Business">Business</option>
+            <option value="Other">Other</option>
+          </select>
+          <button type="submit" className="px-6 py-2 bg-gray-900 text-white rounded-xl hover:bg-gray-800 transition-colors">
+            Search
+          </button>
+        </form>
+
         {/* Filter Toggle */}
         <div className="flex justify-center gap-2 mb-6">
           <button
@@ -346,11 +397,11 @@ const AllEventsModal = ({ onClose, userFavs, toggleFavorite }) => {
               <ChevronLeft className="w-4 h-4" />
               <span>Previous</span>
             </button>
-            
+
             <span className="px-4 py-2 font-semibold text-gray-700">
               {currentPage} / {totalPages}
             </span>
-            
+
             <button
               disabled={currentPage === totalPages}
               onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}

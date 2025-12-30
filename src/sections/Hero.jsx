@@ -42,10 +42,9 @@ const Hero = () => {
 
             {/* Button updated to scroll to #events */}
             <Button
-  text="Find Events"
-  className="md:w-80 md:h-16 w-60 h-12"
-  scrollToId="events" // ✅ Scrolls to the events section
-/>
+              text="Find Events"
+              scrollToId="events"
+            />
           </div>
         </header>
       </div>
