@@ -82,12 +82,12 @@ const Navbar = () => {
 
   return (
     <div
-  className="
-    flex justify-between p-2  relative
+      className="
+    flex justify-between items-center p-3 relative
     bg-gray-100 dark:bg-gray-800
     shadow-md border-b border-gray-300 dark:border-gray-700
   "
->
+    >
 
 
       <NavButton
