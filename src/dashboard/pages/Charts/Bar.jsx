@@ -1,7 +1,9 @@
 import React from 'react';
 import { ChartComponent, SeriesCollectionDirective, SeriesDirective, Inject, Legend, Category, Tooltip, ColumnSeries, DataLabel } from '@syncfusion/ej2-react-charts';
 
-import { barCustomSeries, barPrimaryXAxis, barPrimaryYAxis } from '../../data/dummy';
+const barCustomSeries = [];
+const barPrimaryXAxis = {};
+const barPrimaryYAxis = {};
 import { ChartsHeader } from '../../components';
 import { useStateContext } from '../../contexts/ContextProvider';
 
@@ -9,7 +11,7 @@ const Bar = () => {
   const { currentMode } = useStateContext();
 
   return (
-    <div className="m-4 md:m-10 mt-24 p-10 bg-white dark:bg-secondary-dark-bg rounded-3xl">
+    <div className="bg-white dark:bg-secondary-dark-bg rounded-3xl p-6 shadow-sm">
       <ChartsHeader category="Bar" title="Olympic Medal Counts - RIO" />
       <div className=" w-full">
         <ChartComponent

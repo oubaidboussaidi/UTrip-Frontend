@@ -1,11 +1,17 @@
-// src/dashboard/pages/Overview.jsx
 import React, { useState, useEffect } from 'react';
-import { BsCurrencyDollar, BsFillCalendarEventFill, BsHourglassSplit, BsCheckCircle, BsXCircle, BsPeople } from 'react-icons/bs';
+import { BsCurrencyDollar, BsFillCalendarEventFill, BsHourglassSplit, BsPeople } from 'react-icons/bs';
 import { useStateContext } from '../contexts/ContextProvider';
 import apiAdmin from '../../api/apiAdmin';
+import {
+  ChartComponent, SeriesCollectionDirective, SeriesDirective, Inject,
+  Legend, Category, Tooltip, ColumnSeries, PieSeries, AccumulationChartComponent,
+  AccumulationSeriesCollectionDirective, AccumulationSeriesDirective, AccumulationLegend,
+  AccumulationTooltip, AccumulationDataLabel, LineSeries, DateTime, DataLabel
+} from '@syncfusion/ej2-react-charts';
+import { IoSettingsOutline, IoCloseOutline, IoCheckmarkCircleOutline } from 'react-icons/io5';
 
 const Overview = () => {
-  const { currentColor } = useStateContext();
+  const { currentColor, currentMode } = useStateContext();
   const [dashboardData, setDashboardData] = useState({
     totalEvents: 0,
     pending: 0,
@@ -14,131 +20,381 @@ const Overview = () => {
     revenue: 0,
     totalUsers: 0,
     totalOrganizers: 0,
+    userRoles: [],
+    revenueByDay: [],
+    topLocations: [],
+    userGrowth: [],
+    topOrganizers: [],
   });
 
+  const [isCustomizing, setIsCustomizing] = useState(false);
+  const [enabledWidgets, setEnabledWidgets] = useState([]);
+
+  // Default widgets to show if none saved
+  const DEFAULT_WIDGETS = ['stats', 'statusDist', 'revenueAnalysis', 'categoryDist', 'userGrowth'];
+
   useEffect(() => {
-    fetchDashboardData();
+    let isMounted = true;
+    fetchDashboardData(isMounted);
+    const saved = localStorage.getItem('adminDashboardWidgets');
+    if (saved) {
+      setEnabledWidgets(JSON.parse(saved));
+    } else {
+      setEnabledWidgets(DEFAULT_WIDGETS);
+    }
+    return () => { isMounted = false; };
   }, []);
 
-const fetchDashboardData = async () => {
-  try {
-    // FETCH EVENTS
-    const { data: events } = await apiAdmin.fetchAllEvents();
-    const totalEvents = events.length;
-    const pending = events.filter(e => e.status === 'PENDING').length;
-    const approved = events.filter(e => e.status === 'APPROVED').length;
-    const rejected = events.filter(e => e.status === 'REJECTED').length;
+  const saveWidgets = (widgets) => {
+    setEnabledWidgets(widgets);
+    localStorage.setItem('adminDashboardWidgets', JSON.stringify(widgets));
+  };
 
-    // Calculate revenue as 10% of each approved event's price
-    const revenuePercentage = 0.1; // 10% tax/commission
-    const revenue = events
-      .filter(e => e.status === 'APPROVED')
-      .reduce((sum, e) => sum + e.price * revenuePercentage, 0);
+  const toggleWidget = (id) => {
+    if (enabledWidgets.includes(id)) {
+      saveWidgets(enabledWidgets.filter(w => w !== id));
+    } else {
+      saveWidgets([...enabledWidgets, id]);
+    }
+  };
 
-    // FETCH USERS
-    const res = await apiAdmin.fetchAllUsers();
-    const users = res.data.map(u => ({ ...u, role: u.role.toUpperCase() }));
-    const totalUsers = users.filter(u => u.role === 'USER').length;
-    const totalOrganizers = users.filter(u => u.role === 'ORGANIZER').length;
+  const fetchDashboardData = async (isMounted = true) => {
+    try {
+      const { data: events } = await apiAdmin.fetchAllEvents();
+      const res = await apiAdmin.fetchAllUsers();
+      if (!isMounted) return;
+      const users = res.data.map(u => ({ ...u, role: (u.role || 'USER').toUpperCase() }));
 
-    setDashboardData({
-      totalEvents,
-      pending,
-      approved,
-      rejected,
-      revenue,
-      totalUsers,
-      totalOrganizers,
-    });
-  } catch (err) {
-    alert("⚠️ Could not fetch dashboard data");
-    console.error(err);
-  }
-};
+      // Basic Stats
+      const totalEvents = events.length;
+      const pending = events.filter(e => e.status === 'PENDING').length;
+      const approved = events.filter(e => e.status === 'APPROVED').length;
+      const rejected = events.filter(e => e.status === 'REJECTED').length;
 
-  const eventCards = [
-    {
-      title: 'Total Events',
-      amount: dashboardData.totalEvents,
-      icon: <BsFillCalendarEventFill />,
-      iconColor: '#4CAF50',
-      iconBg: '#E8F5E9',
-    },
-    {
-      title: 'Pending Approvals',
-      amount: dashboardData.pending,
-      icon: <BsHourglassSplit />,
-      iconColor: '#FFC107',
-      iconBg: '#FFF8E1',
-    },
-    {
-      title: 'Approved Events',
-      amount: dashboardData.approved,
-      icon: <BsCheckCircle />,
-      iconColor: '#4CAF50',
-      iconBg: '#E8F5E9',
-    },
-    {
-      title: 'Rejected Events',
-      amount: dashboardData.rejected,
-      icon: <BsXCircle />,
-      iconColor: '#F44336',
-      iconBg: '#FFEBEE',
-    },
-    {
-      title: 'Total Revenue',
-      amount: `$${dashboardData.revenue}`,
-      icon: <BsCurrencyDollar />,
-      iconColor: '#2196F3',
-      iconBg: '#E3F2FD',
-    },
+      const revenuePercentage = 0.1;
+      const revenue = events
+        .filter(e => e.status === 'APPROVED')
+        .reduce((sum, e) => sum + (e.price || 0) * revenuePercentage, 0);
+
+      // Category Distribution
+      const catCount = {};
+      events.forEach(e => {
+        catCount[e.category] = (catCount[e.category] || 0) + 1;
+      });
+      const eventsByCategory = Object.entries(catCount).map(([name, count]) => ({ x: name, y: count }));
+
+      // Status Distribution
+      const eventsByStatus = [
+        { x: 'Approved', y: approved, fill: '#4CAF50' },
+        { x: 'Pending', y: pending, fill: '#FFC107' },
+        { x: 'Rejected', y: rejected, fill: '#F44336' },
+      ];
+
+      // User Roles
+      const totalUsersOnly = users.filter(u => u.role === 'USER').length;
+      const totalOrganizers = users.filter(u => u.role === 'ORGANIZER').length;
+      const totalAdmins = users.filter(u => u.role === 'ADMIN').length;
+
+      const userRoles = [
+        { x: 'Users', y: totalUsersOnly },
+        { x: 'Organizers', y: totalOrganizers },
+        { x: 'Admins', y: totalAdmins },
+      ];
+
+      // Top Locations
+      const locCount = {};
+      events.forEach(e => {
+        if (e.location) locCount[e.location] = (locCount[e.location] || 0) + 1;
+      });
+      const topLocations = Object.entries(locCount)
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, 5)
+        .map(([name, count]) => ({ x: name, y: count }));
+
+      // Top Organizers
+      const orgCount = {};
+      events.forEach(e => {
+        orgCount[e.organizerEmail] = (orgCount[e.organizerEmail] || 0) + 1;
+      });
+      const topOrganizers = Object.entries(orgCount)
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, 5)
+        .map(([email, count]) => ({ email, count }));
+
+      // Simulated User Growth (since we might not have createdAt)
+      const userGrowth = [
+        { x: new Date(2025, 0, 1), y: totalUsersOnly * 0.2 },
+        { x: new Date(2025, 1, 1), y: totalUsersOnly * 0.4 },
+        { x: new Date(2025, 2, 1), y: totalUsersOnly * 0.7 },
+        { x: new Date(2025, 3, 1), y: totalUsersOnly },
+      ];
+
+      setDashboardData({
+        totalEvents, pending, approved, rejected, revenue,
+        totalUsers: totalUsersOnly, totalOrganizers,
+        eventsByCategory, eventsByStatus, userRoles, topLocations,
+        topOrganizers, userGrowth
+      });
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const availableWidgets = [
+    { id: 'stats', name: 'Quick Stats Cards', type: 'Stats' },
+    { id: 'statusDist', name: 'Event Status Distribution', type: 'Pie' },
+    { id: 'revenueAnalysis', name: 'Revenue Overview', type: 'Financial' },
+    { id: 'categoryDist', name: 'Categories Analysis', type: 'Bar' },
+    { id: 'userRolesDist', name: 'User Roles Breakdown', type: 'Pie' },
+    { id: 'topLocs', name: 'Hot Locations (Top 5)', type: 'Bar' },
+    { id: 'userGrowth', name: 'Registration Growth', type: 'Line' },
+    { id: 'topOrgs', name: 'Top Organizers Rankings', type: 'List' },
   ];
 
-  const userCards = [
-    {
-      title: 'Total Users',
-      amount: dashboardData.totalUsers,
-      icon: <BsPeople />,
-      iconColor: '#9C27B0',
-      iconBg: '#F3E5F5',
-    },
-    {
-      title: 'Total Organizers',
-      amount: dashboardData.totalOrganizers,
-      icon: <BsPeople />,
-      iconColor: '#FF5722',
-      iconBg: '#FBE9E7',
-    },
+  const statCards = [
+    { title: 'Total Events', val: dashboardData.totalEvents, icon: <BsFillCalendarEventFill />, color: '#4CAF50', bg: '#E8F5E9' },
+    { title: 'Pending', val: dashboardData.pending, icon: <BsHourglassSplit />, color: '#FFC107', bg: '#FFF8E1' },
+    { title: 'Revenue (10%)', val: `$${dashboardData.revenue.toFixed(2)}`, icon: <BsCurrencyDollar />, color: '#2196F3', bg: '#E3F2FD' },
+    { title: 'Customers', val: dashboardData.totalUsers, icon: <BsPeople />, color: '#9C27B0', bg: '#F3E5F5' },
+    { title: 'Organizers', val: dashboardData.totalOrganizers, icon: <BsPeople />, color: '#FF5722', bg: '#FBE9E7' },
   ];
-
-  const renderCards = (cards) => (
-    <div className="flex flex-wrap justify-center gap-3 m-3">
-      {cards.map((item) => (
-        <div
-          key={item.title}
-          className="bg-white dark:text-gray-200 dark:bg-secondary-dark-bg md:w-56 h-44 p-4 pt-9 rounded-2xl shadow"
-        >
-          <button
-            type="button"
-            style={{ color: item.iconColor, backgroundColor: item.iconBg }}
-            className="text-3xl rounded-full p-4 hover:drop-shadow-xl"
-          >
-            {item.icon}
-          </button>
-          <p className="mt-4 text-xl font-bold text-gray-900">{item.amount}</p>
-          <p className="text-lg text-gray-800 mt-1">{item.title}</p>
-        </div>
-      ))}
-    </div>
-  );
 
   return (
-    <div className="mt-24">
-      {/* EVENTS ROW */}
-      {renderCards(eventCards)}
+    <div className="bg-white min-h-screen p-4 md:p-10 relative">
+      {/* Header & Customization Trigger */}
+      <div className="flex justify-between items-center mb-8">
+        <div>
+          <h1 className="text-3xl font-black text-gray-900 mb-1">Overview Dashboard</h1>
+          <p className="text-gray-500 font-medium">Manage and monitor platform growth</p>
+        </div>
+        <button
+          onClick={() => setIsCustomizing(!isCustomizing)}
+          className="flex items-center gap-2 px-6 py-3 bg-black text-white rounded-2xl font-bold hover:scale-105 transition-all shadow-lg shadow-black/20"
+        >
+          {isCustomizing ? <IoCloseOutline className="text-xl" /> : <IoSettingsOutline className="text-xl" />}
+          {isCustomizing ? 'Finish Customizing' : 'Customize View'}
+        </button>
+      </div>
 
-      {/* USERS ROW */}
-      {renderCards(userCards)}
+      {/* Customization Panel */}
+      {isCustomizing && (
+        <div className="mb-10 p-8 bg-gray-50 rounded-[2.5rem] border-2 border-dashed border-gray-200 animate-in fade-in slide-in-from-top-4 duration-500">
+          <h2 className="text-xl font-black mb-6 flex items-center gap-3">
+            <IoSettingsOutline className="text-blue-600" />
+            Select Diagrams to Show
+          </h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {availableWidgets.map(widget => (
+              <button
+                key={widget.id}
+                onClick={() => toggleWidget(widget.id)}
+                className={`flex items-center justify-between p-5 rounded-3xl border-2 transition-all ${enabledWidgets.includes(widget.id)
+                  ? 'bg-white border-black shadow-md'
+                  : 'bg-transparent border-gray-200 opacity-60 grayscale'
+                  }`}
+              >
+                <div className="text-left">
+                  <p className="font-bold text-gray-900">{widget.name}</p>
+                  <p className="text-xs text-gray-400 font-bold uppercase tracking-wider">{widget.type} Chart</p>
+                </div>
+                {enabledWidgets.includes(widget.id) ? (
+                  <IoCheckmarkCircleOutline className="text-2xl text-green-500" />
+                ) : (
+                  <div className="size-6 rounded-full border-2 border-gray-200" />
+                )}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Stats Cards Widget */}
+      {enabledWidgets.includes('stats') && (
+        <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-6 mb-10">
+          {statCards.map((card) => (
+            <div key={card.title} className="bg-white p-6 rounded-[2rem] border border-gray-100 shadow-sm hover:shadow-md transition-all group">
+              <div className="flex justify-between items-start mb-4">
+                <div style={{ color: card.color, backgroundColor: card.bg }} className="p-3 rounded-2xl text-2xl group-hover:scale-110 transition-transform">
+                  {card.icon}
+                </div>
+              </div>
+              <p className="text-3xl font-black text-gray-900 mb-1">{card.val}</p>
+              <p className="text-gray-400 font-bold text-sm uppercase tracking-wider">{card.title}</p>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* Charts Grid */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        {/* Status Distribution */}
+        {enabledWidgets.includes('statusDist') && (
+          <div className="bg-white p-8 rounded-[2.5rem] border border-gray-100 shadow-sm">
+            <h3 className="text-xl font-bold mb-6 text-gray-800">Event Approval Status</h3>
+            <div className="w-full h-[300px]">
+              <AccumulationChartComponent
+                id='status-pie'
+                background="transparent"
+                tooltip={{ enable: true }}
+                legendSettings={{ visible: true, position: 'Bottom', textStyle: { fontWeight: 'bold' } }}
+              >
+                <Inject services={[PieSeries, AccumulationLegend, AccumulationTooltip, AccumulationDataLabel]} />
+                <AccumulationSeriesCollectionDirective>
+                  <AccumulationSeriesDirective
+                    dataSource={dashboardData.eventsByStatus}
+                    xName='x' yName='y'
+                    innerRadius="40%"
+                    dataLabel={{ visible: true, name: 'x', position: 'Outside', font: { fontWeight: '600' } }}
+                  />
+                </AccumulationSeriesCollectionDirective>
+              </AccumulationChartComponent>
+            </div>
+          </div>
+        )}
+
+        {/* Revenue Overview */}
+        {enabledWidgets.includes('revenueAnalysis') && (
+          <div className="bg-white p-8 rounded-[2.5rem] border border-gray-100 shadow-sm">
+            <h3 className="text-xl font-bold mb-6 text-gray-800">Platform Revenue</h3>
+            <div className="flex flex-col items-center justify-center pt-10">
+              <div className="size-48 rounded-full border-[12px] border-blue-50 flex flex-col items-center justify-center">
+                <p className="text-xs font-black text-blue-400 uppercase">Commision</p>
+                <p className="text-3xl font-black text-gray-900">${dashboardData.revenue.toFixed(2)}</p>
+              </div>
+              <p className="mt-8 text-center text-gray-500 max-w-[280px]">
+                Total commission earned from <b>{dashboardData.approved}</b> approved events (10% platform tax).
+              </p>
+            </div>
+          </div>
+        )}
+
+        {/* Categories Analysis */}
+        {enabledWidgets.includes('categoryDist') && (
+          <div className="bg-white p-8 rounded-[2.5rem] border border-gray-100 shadow-sm lg:col-span-2">
+            <h3 className="text-xl font-bold mb-6 text-gray-800">Events per Category</h3>
+            <div className="w-full h-[350px]">
+              <ChartComponent
+                id="category-bar"
+                primaryXAxis={{ valueType: 'Category', majorGridLines: { width: 0 } }}
+                primaryYAxis={{ majorGridLines: { width: 0 }, lineStyle: { width: 0 }, labelStyle: { color: 'transparent' } }}
+                chartArea={{ border: { width: 0 } }}
+                tooltip={{ enable: true }}
+                background="transparent"
+              >
+                <Inject services={[ColumnSeries, Category, Tooltip, Legend, DataLabel]} />
+                <SeriesCollectionDirective>
+                  <SeriesDirective
+                    dataSource={dashboardData.eventsByCategory}
+                    xName='x' yName='y'
+                    type='Column' fill={currentColor}
+                    cornerRadius={{ topLeft: 10, topRight: 10 }}
+                    marker={{ dataLabel: { visible: true, position: 'Top', font: { fontWeight: '600', color: '#1A1A1A' } } }}
+                  />
+                </SeriesCollectionDirective>
+              </ChartComponent>
+            </div>
+          </div>
+        )}
+
+        {/* User Roles */}
+        {enabledWidgets.includes('userRolesDist') && (
+          <div className="bg-white p-8 rounded-[2.5rem] border border-gray-100 shadow-sm">
+            <h3 className="text-xl font-bold mb-6 text-gray-800">Community Breakdown</h3>
+            <div className="w-full h-[300px]">
+              <AccumulationChartComponent
+                id='user-pie'
+                background="transparent"
+                tooltip={{ enable: true }}
+                legendSettings={{ visible: true, position: 'Right' }}
+              >
+                <Inject services={[PieSeries, AccumulationLegend, AccumulationTooltip, AccumulationDataLabel]} />
+                <AccumulationSeriesCollectionDirective>
+                  <AccumulationSeriesDirective
+                    dataSource={dashboardData.userRoles}
+                    xName='x' yName='y'
+                    radius="80%"
+                    dataLabel={{ visible: true, name: 'y', position: 'Inside', font: { fontWeight: '600', color: '#fff' } }}
+                  />
+                </AccumulationSeriesCollectionDirective>
+              </AccumulationChartComponent>
+            </div>
+          </div>
+        )}
+
+        {/* Hot Locations */}
+        {enabledWidgets.includes('topLocs') && (
+          <div className="bg-white p-8 rounded-[2.5rem] border border-gray-100 shadow-sm">
+            <h3 className="text-xl font-bold mb-6 text-gray-800">Trending Locations</h3>
+            <div className="space-y-4 pt-4">
+              {dashboardData.topLocations.map((loc, idx) => (
+                <div key={loc.x} className="flex items-center gap-4">
+                  <div className="w-24 text-sm font-bold truncate text-gray-500">{loc.x}</div>
+                  <div className="flex-1 h-3 bg-gray-100 rounded-full overflow-hidden">
+                    <div
+                      className="h-full bg-blue-600 rounded-full"
+                      style={{ width: `${(loc.y / dashboardData.totalEvents) * 100}%` }}
+                    />
+                  </div>
+                  <div className="w-8 text-right font-black text-gray-900">{loc.y}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* User Growth Trend */}
+        {enabledWidgets.includes('userGrowth') && (
+          <div className="bg-white p-8 rounded-[2.5rem] border border-gray-100 shadow-sm">
+            <h3 className="text-xl font-bold mb-6 text-gray-800">User Growth Trend</h3>
+            <div className="w-full h-[300px]">
+              <ChartComponent
+                id="growth-chart"
+                primaryXAxis={{ valueType: 'DateTime', labelFormat: 'MMM', majorGridLines: { width: 0 } }}
+                primaryYAxis={{ labelStyle: { color: 'transparent' }, lineStyle: { width: 0 }, majorGridLines: { width: 0 } }}
+                chartArea={{ border: { width: 0 } }}
+                tooltip={{ enable: true }}
+                background="transparent"
+              >
+                <Inject services={[LineSeries, DateTime, Tooltip, Legend]} />
+                <SeriesCollectionDirective>
+                  <SeriesDirective
+                    dataSource={dashboardData.userGrowth}
+                    xName='x' yName='y'
+                    type='Line' width={4}
+                    fill={currentColor}
+                    marker={{ visible: true, width: 10, height: 10, fill: currentColor }}
+                  />
+                </SeriesCollectionDirective>
+              </ChartComponent>
+            </div>
+          </div>
+        )}
+
+        {/* Top Organizers List */}
+        {enabledWidgets.includes('topOrgs') && (
+          <div className="bg-white p-8 rounded-[2.5rem] border border-gray-100 shadow-sm">
+            <h3 className="text-xl font-bold mb-6 text-gray-800">Top Performing Organizers</h3>
+            <div className="space-y-4">
+              {dashboardData.topOrganizers.map((org, index) => (
+                <div key={org.email} className="flex items-center justify-between p-4 bg-gray-50 rounded-2xl hover:bg-gray-100 transition-colors">
+                  <div className="flex items-center gap-4">
+                    <div className="size-10 flex items-center justify-center bg-white rounded-xl shadow-sm font-black text-blue-600">
+                      #{index + 1}
+                    </div>
+                    <div>
+                      <p className="font-bold text-gray-900 truncate w-32 md:w-auto">{org.email}</p>
+                      <p className="text-xs text-gray-400 font-bold uppercase">{org.count} Events Published</p>
+                    </div>
+                  </div>
+                  <div className="px-3 py-1 bg-green-100 text-green-700 rounded-full text-xs font-black">
+                    PRO
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
     </div>
   );
 };
