@@ -25,7 +25,7 @@ const ReservationsStats = () => {
         fetchData();
     }, []);
 
-    if (!stats) return <div className="m-2 md:m-10 mt-24 p-10 bg-white dark:bg-secondary-dark-bg rounded-3xl">Loading...</div>;
+    if (!stats) return <div className="p-10 text-center">Loading...</div>;
 
     // Process Revenue Over Time Data for Chart
     const revenueData = Object.entries(stats.revenueOverTime || {})
@@ -37,7 +37,7 @@ const ReservationsStats = () => {
         .map(([title, count]) => ({ x: title, y: count }));
 
     return (
-        <div className="m-2 md:m-10 mt-24 p-2 md:p-10 bg-white dark:bg-secondary-dark-bg rounded-3xl">
+        <div className="bg-white dark:bg-secondary-dark-bg rounded-3xl p-6 shadow-sm">
             <Header category="Analytics" title="Reservations & Revenue" />
 
             {/* CARDS */}

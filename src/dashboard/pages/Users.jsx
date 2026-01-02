@@ -98,7 +98,7 @@ const Users = () => {
   };
 
   return (
-    <div className="m-2 md:m-10 mt-24 p-2 md:p-10 bg-white rounded-3xl">
+    <div className="bg-white min-h-screen p-6 md:p-10">
       <Header category="Page" title="Customers" />
 
       <GridComponent
@@ -126,10 +126,10 @@ const Users = () => {
           <ColumnDirective field="lastName" headerText="Last Name" width="150" />
           <ColumnDirective field="email" headerText="Email" width="250" />
 
-          <ColumnDirective 
-            field="role" 
-            headerText="Role" 
-            width="100" 
+          <ColumnDirective
+            field="role"
+            headerText="Role"
+            width="100"
             textAlign="Center"
           />
 
