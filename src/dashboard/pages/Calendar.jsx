@@ -15,13 +15,18 @@ const Scheduler = () => {
     const fetchEvents = async () => {
       try {
         const { data } = await apiAdmin.fetchAllEvents();
-        const formatted = data.map(ev => ({
-          Id: ev.id,
-          Subject: ev.title,
-          StartTime: new Date(ev.date),          // assuming ev.date is a valid date string
-          EndTime: new Date(new Date(ev.date).getTime() + 60 * 60 * 1000), // +1 hour
-          IsAllDay: false
-        }));
+        const formatted = data.map(ev => {
+          const startDate = new Date(ev.date || ev.startTime);
+          return {
+            Id: ev.id,
+            Subject: ev.title || "Untitled Event",
+            StartTime: startDate,
+            EndTime: new Date(startDate.getTime() + (2 * 60 * 60 * 1000)), // Default 2 hours if no end time
+            IsAllDay: false,
+            Location: ev.location,
+            CategoryColor: '#1aaa55'
+          };
+        });
         setEvents(formatted);
       } catch (err) {
         console.error("Error fetching events:", err);
@@ -40,7 +45,7 @@ const Scheduler = () => {
   };
 
   return (
-    <div className="m-2 md:m-10 mt-24 p-2 md:p-10 bg-white rounded-3xl">
+    <div className="bg-white rounded-3xl p-6 shadow-sm">
       <Header category="App" title="Calendar" />
       <ScheduleComponent
         height="650px"
