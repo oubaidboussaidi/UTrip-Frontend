@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import { MdOutlineCancel } from 'react-icons/md';
 import { Button } from '.';
 import { useStateContext } from '../contexts/ContextProvider';
 import apiAdmin from '../../api/apiAdmin';
@@ -43,14 +42,6 @@ const Notification = () => {
             </button>
           )}
         </div>
-        <Button
-          icon={<MdOutlineCancel />}
-          color="rgb(153, 171, 180)"
-          bgHoverColor="light-gray"
-          size="2xl"
-          borderRadius="50%"
-          onClick={() => handleClick('notification')} // Close popup
-        />
       </div>
 
       <div className="mt-5 max-h-96 overflow-y-auto">
