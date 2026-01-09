@@ -5,13 +5,11 @@ import {
 } from '@syncfusion/ej2-react-charts';
 
 import { BsCurrencyDollar, BsCalendarCheck, BsHeartFill } from 'react-icons/bs';
-import { getOrganizerStats } from '../../api/apiStats';
-import Navbar from '../../components/NavBar';
-import { TrendingUp, Users } from 'lucide-react';
+import { useStateContext } from '../contexts/ContextProvider';
+import { Header } from '../components';
 
 const OrganizerStats = ({ organizerEmail, embedded = false }) => {
-    // Determine theme or force light for now as per user site style
-    const currentMode = 'Light';
+    const { currentMode } = useStateContext();
 
     const [stats, setStats] = useState(null);
     const [loading, setLoading] = useState(true);
@@ -35,14 +33,14 @@ const OrganizerStats = ({ organizerEmail, embedded = false }) => {
     }, [emailToUse]);
 
     if (loading) return (
-        <div className={embedded ? "p-10 text-center" : "min-h-screen bg-gray-50"}>
+        <div className={embedded ? "p-10 text-center" : "min-h-screen bg-gray-50/50 dark:bg-main-dark-bg text-gray-900 dark:text-white"}>
             {!embedded && <Navbar />}
             <div className={embedded ? "" : "pt-32 text-center"}>Loading statistics...</div>
         </div>
     );
 
     if (!stats) return (
-        <div className={embedded ? "p-10 text-center" : "min-h-screen bg-gray-50"}>
+        <div className={embedded ? "p-10 text-center" : "min-h-screen bg-gray-50/50 dark:bg-main-dark-bg text-gray-900 dark:text-white"}>
             {!embedded && <Navbar />}
             <div className={embedded ? "" : "pt-32 text-center"}>No statistics available.</div>
         </div>
@@ -54,16 +52,13 @@ const OrganizerStats = ({ organizerEmail, embedded = false }) => {
         : [];
 
     return (
-        <div className={embedded ? "" : "min-h-screen bg-gray-50 text-gray-900"}>
+        <div className={embedded ? "" : "min-h-screen bg-gray-50/50 dark:bg-main-dark-bg text-gray-900 dark:text-white p-4 md:p-10 pb-20 mt-16"}>
             {!embedded && <Navbar />}
 
-            <div className={embedded ? "" : "pt-32 px-5 md:px-20 max-w-7xl mx-auto pb-20"}>
-                {/* Header Section */}
+            <div className={embedded ? "" : "max-w-7xl mx-auto"}>
+                {/* Standardized Header */}
                 {!embedded && (
-                    <div className="mb-8">
-                        <h1 className="text-4xl font-bold text-gray-900 mb-2">My Performance</h1>
-                        <p className="text-gray-500">Track your revenue and reservations</p>
-                    </div>
+                    <Header category="Organizer" title="My Performance" />
                 )}
 
                 {!embedded && (

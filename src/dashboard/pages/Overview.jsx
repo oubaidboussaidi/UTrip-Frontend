@@ -159,27 +159,41 @@ const Overview = () => {
     { title: 'Organizers', val: dashboardData.totalOrganizers, icon: <BsPeople />, color: '#FF5722', bg: '#FBE9E7' },
   ];
 
+  const user = JSON.parse(localStorage.getItem('user'));
+  const today = new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+
   return (
-    <div className="bg-white min-h-screen p-4 md:p-10 relative">
-      {/* Header & Customization Trigger */}
-      <div className="flex justify-between items-center mb-8">
+    <div className="bg-gray-50/50 dark:bg-main-dark-bg min-h-screen p-4 md:p-10 relative">
+      {/* Premium Hero Section */}
+      <div className="mb-10 bg-white dark:bg-gray-800 p-8 rounded-[3rem] shadow-sm border border-gray-100 dark:border-gray-700 flex flex-col md:flex-row justify-between items-center gap-6">
         <div>
-          <h1 className="text-3xl font-black text-gray-900 mb-1">Overview Dashboard</h1>
-          <p className="text-gray-500 font-medium">Manage and monitor platform growth</p>
+          <p className="text-blue-600 dark:text-blue-400 font-black uppercase tracking-[0.3em] text-[10px] mb-2">
+            Platform Analytics
+          </p>
+          <h1 className="text-4xl font-black text-gray-900 dark:text-white mb-2 tracking-tight">
+            Welcome back, <span className="text-blue-600">{user?.firstName || 'Admin'}</span>! 👋
+          </h1>
+          <p className="text-gray-500 dark:text-gray-400 font-bold flex items-center gap-2">
+            <BsFillCalendarEventFill className="text-blue-500" />
+            It's {today}
+          </p>
         </div>
-        <button
-          onClick={() => setIsCustomizing(!isCustomizing)}
-          className="flex items-center gap-2 px-6 py-3 bg-black text-white rounded-2xl font-bold hover:scale-105 transition-all shadow-lg shadow-black/20"
-        >
-          {isCustomizing ? <IoCloseOutline className="text-xl" /> : <IoSettingsOutline className="text-xl" />}
-          {isCustomizing ? 'Finish Customizing' : 'Customize View'}
-        </button>
+
+        <div className="flex items-center gap-3">
+          <button
+            onClick={() => setIsCustomizing(!isCustomizing)}
+            className="flex items-center gap-2 px-8 py-4 bg-gray-900 dark:bg-white dark:text-black text-white rounded-2xl font-black hover:scale-105 transition-all shadow-xl shadow-gray-900/10 text-sm uppercase tracking-widest"
+          >
+            {isCustomizing ? <IoCloseOutline className="text-xl" /> : <IoSettingsOutline className="text-xl" />}
+            {isCustomizing ? 'Finish' : 'Customize Layout'}
+          </button>
+        </div>
       </div>
 
       {/* Customization Panel */}
       {isCustomizing && (
-        <div className="mb-10 p-8 bg-gray-50 rounded-[2.5rem] border-2 border-dashed border-gray-200 animate-in fade-in slide-in-from-top-4 duration-500">
-          <h2 className="text-xl font-black mb-6 flex items-center gap-3">
+        <div className="mb-10 p-8 bg-white dark:bg-gray-800 rounded-[2.5rem] border-2 border-dashed border-gray-200 dark:border-gray-700 animate-in fade-in slide-in-from-top-4 duration-500">
+          <h2 className="text-xl font-black mb-6 flex items-center gap-3 text-gray-900 dark:text-white">
             <IoSettingsOutline className="text-blue-600" />
             Select Diagrams to Show
           </h2>
@@ -189,18 +203,18 @@ const Overview = () => {
                 key={widget.id}
                 onClick={() => toggleWidget(widget.id)}
                 className={`flex items-center justify-between p-5 rounded-3xl border-2 transition-all ${enabledWidgets.includes(widget.id)
-                  ? 'bg-white border-black shadow-md'
-                  : 'bg-transparent border-gray-200 opacity-60 grayscale'
+                  ? 'bg-white dark:bg-gray-700 border-gray-900 dark:border-white shadow-md'
+                  : 'bg-transparent border-gray-200 dark:border-gray-600 opacity-60 grayscale'
                   }`}
               >
                 <div className="text-left">
-                  <p className="font-bold text-gray-900">{widget.name}</p>
+                  <p className="font-bold text-gray-900 dark:text-white">{widget.name}</p>
                   <p className="text-xs text-gray-400 font-bold uppercase tracking-wider">{widget.type} Chart</p>
                 </div>
                 {enabledWidgets.includes(widget.id) ? (
                   <IoCheckmarkCircleOutline className="text-2xl text-green-500" />
                 ) : (
-                  <div className="size-6 rounded-full border-2 border-gray-200" />
+                  <div className="size-6 rounded-full border-2 border-gray-200 dark:border-gray-600" />
                 )}
               </button>
             ))}
@@ -212,14 +226,18 @@ const Overview = () => {
       {enabledWidgets.includes('stats') && (
         <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-6 mb-10">
           {statCards.map((card) => (
-            <div key={card.title} className="bg-white p-6 rounded-[2rem] border border-gray-100 shadow-sm hover:shadow-md transition-all group">
-              <div className="flex justify-between items-start mb-4">
-                <div style={{ color: card.color, backgroundColor: card.bg }} className="p-3 rounded-2xl text-2xl group-hover:scale-110 transition-transform">
+            <div key={card.title} className="bg-white dark:bg-gray-800 p-8 rounded-[2.5rem] border border-gray-100 dark:border-gray-700 shadow-sm hover:shadow-2xl hover:-translate-y-2 transition-all duration-500 group relative overflow-hidden">
+              <div className="absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-10 transition-opacity">
+                <div className="text-6xl -mr-4 -mt-4 rotate-12 text-gray-400 dark:text-gray-200">{card.icon}</div>
+              </div>
+
+              <div className="flex justify-between items-start mb-6">
+                <div style={{ color: card.color, backgroundColor: card.bg }} className="p-4 rounded-2xl text-2xl group-hover:scale-110 transition-transform shadow-inner">
                   {card.icon}
                 </div>
               </div>
-              <p className="text-3xl font-black text-gray-900 mb-1">{card.val}</p>
-              <p className="text-gray-400 font-bold text-sm uppercase tracking-wider">{card.title}</p>
+              <p className="text-4xl font-black text-gray-900 dark:text-white mb-2 tracking-tight">{card.val}</p>
+              <p className="text-gray-400 dark:text-gray-500 font-black text-xs uppercase tracking-widest">{card.title}</p>
             </div>
           ))}
         </div>
