@@ -45,7 +45,7 @@ const Scheduler = () => {
   };
 
   return (
-    <div className="bg-white rounded-3xl p-6 shadow-sm">
+    <div className="bg-gray-50/50 dark:bg-main-dark-bg min-h-screen p-6 md:p-10 text-gray-900 dark:text-white">
       <Header category="App" title="Calendar" />
       <ScheduleComponent
         height="650px"
