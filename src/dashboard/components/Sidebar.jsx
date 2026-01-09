@@ -49,52 +49,61 @@ const Sidebar = () => {
       className="
         h-full w-72 md:overflow-hidden overflow-auto md:hover:overflow-auto pb-10
         bg-gray-100 dark:bg-gray-800
-        shadow-md border-r border-gray-300 dark:border-gray-700
+        shadow-2xl border-r border-gray-200 dark:border-gray-700
       "
     >
       {activeMenu && (
         <>
-          <div className="flex justify-between items-center">
+          <div className="flex justify-between items-center px-6 py-8">
             <Link
               to="/"
               onClick={handleCloseSideBar}
-              className="items-center gap-3 ml-3 mt-4 flex text-xl font-extrabold tracking-tight dark:text-white text-slate-900"
+              className="group items-center gap-3 flex text-2xl font-black tracking-tighter text-gray-900 dark:text-white"
             >
-              <FaPlane size={24} style={{ marginRight: '8px' }} />
-              <span>Utrip</span>
+              <div className="bg-blue-600 p-2 rounded-2xl group-hover:scale-110 group-hover:rotate-12 transition-all duration-300 shadow-lg shadow-blue-600/30">
+                <FaPlane size={24} className="text-white" />
+              </div>
+              <span className="bg-gradient-to-r from-gray-900 to-gray-600 dark:from-white dark:to-gray-400 bg-clip-text text-transparent">Utrip</span>
             </Link>
             <TooltipComponent content="Menu" position="BottomCenter">
               <button
                 type="button"
                 onClick={() => setActiveMenu(!activeMenu)}
-                style={{ color: currentColor }}
-                className="text-xl rounded-full p-3 hover:bg-light-gray mt-4 block md:hidden"
+                className="text-2xl rounded-full p-2 hover:bg-gray-200 dark:hover:bg-white/10 text-gray-400 mt-1 block md:hidden transition-colors"
               >
                 <MdOutlineCancel />
               </button>
             </TooltipComponent>
           </div>
 
-          <div className="mt-10">
+          <div className="mt-4 px-4">
             {filteredLinks.map((item) => (
-              <div key={item.title}>
-                <p className="text-gray-400 dark:text-gray-400 m-3 mt-4 uppercase">
+              <div key={item.title} className="mb-8">
+                <p className="text-gray-500 font-black text-[10px] uppercase tracking-[0.3em] mb-4 pl-4 opacity-70">
                   {item.title}
                 </p>
-                {item.links.map((link) => (
-                  <NavLink
-                    to={`/${link.link}`} // use link property
-                    key={link.name}
-                    onClick={handleCloseSideBar}
-                    style={({ isActive }) => ({
-                      backgroundColor: isActive ? currentColor : '',
-                    })}
-                    className={({ isActive }) => (isActive ? activeLink : normalLink)}
-                  >
-                    {link.icon}
-                    <span className="capitalize">{link.name}</span>
-                  </NavLink>
-                ))}
+                <div className="space-y-1">
+                  {item.links.map((link) => (
+                    <NavLink
+                      to={`/${link.link}`}
+                      key={link.name}
+                      onClick={handleCloseSideBar}
+                      style={({ isActive }) => ({
+                        backgroundColor: isActive ? currentColor : '',
+                        boxShadow: isActive ? `0 10px 15px -3px ${currentColor}40` : '',
+                      })}
+                      className={({ isActive }) =>
+                        `flex items-center gap-4 px-4 py-3.5 rounded-2xl text-sm font-bold transition-all duration-300 group
+                        ${isActive
+                          ? 'text-white translate-x-1'
+                          : 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-200 dark:hover:bg-white/5 hover:translate-x-1'}`
+                      }
+                    >
+                      <span className="text-lg opacity-80 group-hover:opacity-100 transition-opacity">{link.icon}</span>
+                      <span className="capitalize tracking-tight">{link.name}</span>
+                    </NavLink>
+                  ))}
+                </div>
               </div>
             ))}
           </div>
