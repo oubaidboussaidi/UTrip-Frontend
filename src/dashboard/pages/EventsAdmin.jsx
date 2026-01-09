@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import {
   GridComponent,
   ColumnsDirective,
@@ -10,6 +11,7 @@ import {
   Edit,
   Sort,
   Filter,
+  Search,
 } from '@syncfusion/ej2-react-grids';
 
 import { Header } from '../components';
@@ -18,6 +20,10 @@ import apiAdmin from '../../api/apiAdmin';
 const EventsAdmin = () => {
   const [events, setEvents] = useState([]);
   const gridRef = useRef(null);
+  const location = useLocation();
+
+  const searchParams = new URLSearchParams(location.search);
+  const initialSearch = searchParams.get('search') || "";
 
   const selectionSettings = {
     type: 'Multiple',
@@ -33,6 +39,19 @@ const EventsAdmin = () => {
     console.log("▶ useEffect → fetchEvents()");
     fetchEvents();
   }, []);
+
+  useEffect(() => {
+    if (gridRef.current) {
+      if (initialSearch) {
+        setTimeout(() => {
+          gridRef.current.search(initialSearch);
+        }, 1000);
+      } else {
+        // Clear search if no param is present
+        gridRef.current.search("");
+      }
+    }
+  }, [initialSearch, events]);
 
   const fetchEvents = async () => {
     console.log("▶ fetchEvents CALLED");
@@ -247,7 +266,7 @@ const EventsAdmin = () => {
   // RENDER GRID
   // ================================================================
   return (
-    <div className="bg-white min-h-screen p-6 md:p-10">
+    <div className="bg-gray-50/50 dark:bg-main-dark-bg min-h-screen p-6 md:p-10 text-gray-900 dark:text-white">
       <Header category="Page" title="Manage Events" />
 
       <GridComponent
@@ -296,7 +315,7 @@ const EventsAdmin = () => {
 
         </ColumnsDirective>
 
-        <Inject services={[Page, Selection, Toolbar, Edit, Sort, Filter]} />
+        <Inject services={[Page, Selection, Toolbar, Edit, Sort, Filter, Search]} />
       </GridComponent>
     </div>
   );
