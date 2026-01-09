@@ -98,7 +98,7 @@ const Users = () => {
   };
 
   return (
-    <div className="bg-white min-h-screen p-6 md:p-10">
+    <div className="bg-gray-50/50 dark:bg-main-dark-bg min-h-screen p-6 md:p-10 text-gray-900 dark:text-white">
       <Header category="Page" title="Customers" />
 
       <GridComponent
