@@ -7,14 +7,8 @@ import DashboardApp from "./dashboard/DashboardApp.jsx";
 
 import Overview from "./dashboard/pages/Overview"
 import EventsAdmin from "./dashboard/pages/EventsAdmin";
-import Employees from "./dashboard/pages/Employees";
 import Users from "./dashboard/pages/Users";
 import Calendar from "./dashboard/pages/Calendar";
-import Kanban from "./dashboard/pages/Kanban";
-import Line from "./dashboard/pages/Charts/Line";
-import Area from "./dashboard/pages/Charts/Area";
-import Bar from "./dashboard/pages/Charts/Bar";
-import Pie from "./dashboard/pages/Charts/Pie";
 import ReservationsStats from "./dashboard/pages/ReservationsStats"; // New Import
 import AdminRoute from "./routes/AdminRoute"; // Kept for reference or simple usage if needed
 import ProtectedRoute from "./routes/ProtectedRoute";
@@ -83,12 +77,6 @@ ReactDOM.render(
             </ProtectedRoute>
           } />
 
-          <Route path="employees" element={
-            <ProtectedRoute allowedRoles={['ADMIN']}>
-              <Employees />
-            </ProtectedRoute>
-          } />
-
           <Route path="calendar" element={
             <ProtectedRoute allowedRoles={['ADMIN']}>
               <Calendar />
@@ -101,16 +89,9 @@ ReactDOM.render(
             </ProtectedRoute>
           } />
 
-          {/* Admin Charts */}
-          <Route path="kanban" element={<ProtectedRoute allowedRoles={['ADMIN']}><Kanban /></ProtectedRoute>} />
-          <Route path="line" element={<ProtectedRoute allowedRoles={['ADMIN']}><Line /></ProtectedRoute>} />
-          <Route path="area" element={<ProtectedRoute allowedRoles={['ADMIN']}><Area /></ProtectedRoute>} />
-          <Route path="bar" element={<ProtectedRoute allowedRoles={['ADMIN']}><Bar /></ProtectedRoute>} />
-          <Route path="pie" element={<ProtectedRoute allowedRoles={['ADMIN']}><Pie /></ProtectedRoute>} />
-
         </Route>
-      </Routes>
-    </BrowserRouter>
-  </React.StrictMode>,
+      </Routes >
+    </BrowserRouter >
+  </React.StrictMode >,
   document.getElementById("root")
 );

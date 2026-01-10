@@ -26,20 +26,14 @@ export const links = [
       },
     ],
   },
-
   {
-    title: 'Pages',
+    title: 'Management',
     links: [
       {
         link: 'dashboard/users',
         name: 'Users',
         icon: <IoMdContacts />,
-      },/*
-      {
-        link: 'employees',
-        name: 'Employees',
-        icon: <FaSuitcaseRolling />,
-      },*/
+      },
       {
         link: 'dashboard/events',
         name: 'Events',
@@ -64,67 +58,7 @@ export const links = [
         link: 'dashboard/calendar',
         name: 'Events Calendar',
         icon: <AiOutlineCalendar />,
-      },/*
-      {
-        link: 'kanban',
-        name: 'Kanban',
-        icon: <BsKanban />,
       },
-      {
-        link: 'editor',
-        name: 'Editor',
-        icon: <FiEdit />,
-      },
-      {
-        link: 'color-picker',
-        name: 'Color Picker',
-        icon: <BiColorFill />,
-      },
-    ],
-  },
-  {
-    title: 'Charts',
-    links: [
-      {
-        link: 'line',
-        name: 'Line',
-        icon: <AiOutlineStock />,
-      },
-      {
-        link: 'area',
-        name: 'Area',
-        icon: <AiOutlineAreaChart />,
-      },
-      {
-        link: 'bar',
-        name: 'Bar',
-        icon: <AiOutlineBarChart />,
-      },
-      {
-        link: 'pie',
-        name: 'Pie',
-        icon: <FiPieChart />,
-      },
-      {
-        link: 'financial',
-        name: 'Financial',
-        icon: <RiStockLine />,
-      },
-      {
-        link: 'color-mapping',
-        name: 'Color Mapping',
-        icon: <BsBarChart />,
-      },
-      {
-        link: 'pyramid',
-        name: 'Pyramid',
-        icon: <GiLouvrePyramid />,
-      },
-      {
-        link: 'stacked',
-        name: 'Stacked',
-        icon: <AiOutlineBarChart />,
-      },*/
     ],
   },
 ];
