@@ -34,7 +34,7 @@ const DashboardLayout = () => {
         </div>
 
         {/* Page Content - Offset by Navbar height */}
-        <div className="flex-1 bg-white dark:bg-main-dark-bg overflow-x-hidden pt-16">
+        <div className="flex-1 bg-white dark:bg-main-dark-bg overflow-x-hidden pt-16 text-gray-900 dark:text-white">
           <div className="p-0 md:p-0">
             <Outlet />
           </div>

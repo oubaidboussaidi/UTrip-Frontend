@@ -1,13 +1,28 @@
 import React from 'react';
+import { useStateContext } from '../contexts/ContextProvider';
 
-const ChartsHeader = ({ category, title }) => (
-  <div className=" mb-10">
-    <div>
-      <p className="text-lg text-gray-400">Chart</p>
-      <p className="text-3xl font-extrabold tracking-tight dark:text-gray-200 text-slate-900">{category}</p>
+const ChartsHeader = ({ category, title }) => {
+  const { currentMode } = useStateContext();
+
+  return (
+    <div className="mb-10">
+      <div>
+        <p className="text-blue-600 dark:text-blue-400 font-black uppercase tracking-[0.2em] text-xs mb-1">
+          {category}
+        </p>
+        <p
+          className="text-3xl font-black tracking-tight"
+          style={{ color: currentMode === 'Dark' ? '#FFFFFF' : '#111827' }}
+        >
+          Chart Analysis
+        </p>
+      </div>
+      <p className="text-gray-500 dark:text-gray-400 font-bold text-lg mt-2">
+        {title}
+      </p>
+      <div className="h-1.5 w-12 bg-blue-600 rounded-full mt-3 opacity-80" />
     </div>
-    <p className="text-center dark:text-gray-200 text-xl mb-2 mt-3">{title}</p>
-  </div>
-);
+  );
+};
 
 export default ChartsHeader;
