@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import NavBar from "../components/Navbar";
+import NavBar from "../components/NavBar";
 import { Sparkles, Calendar, MapPin, Tag, ChevronRight } from "lucide-react";
 import EventDetailsModal from "../components/EventDetailsModal";
 const RecommendedEvents = () => {
@@ -13,11 +13,16 @@ const RecommendedEvents = () => {
         // Get user from local storage
         const storedUser = localStorage.getItem("user");
         if (storedUser) {
-            setUser(JSON.parse(storedUser));
+            const parsedUser = JSON.parse(storedUser);
+            setUser(parsedUser);
+            console.log("User from localStorage:", parsedUser);
+            console.log("User ID:", parsedUser.id);
         }
 
         // Simulate fetching recommendations
-        fetchRecommendations(storedUser ? JSON.parse(storedUser).id : 'guest');
+        const userId = storedUser ? JSON.parse(storedUser).id || 'guest' : 'guest';
+        console.log("Fetching recommendations for userId:", userId);
+        fetchRecommendations(userId);
     }, []);
 
     const fetchRecommendations = async (userId) => {
