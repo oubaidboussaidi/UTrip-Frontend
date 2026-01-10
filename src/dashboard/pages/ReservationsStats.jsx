@@ -37,7 +37,7 @@ const ReservationsStats = () => {
         .map(([title, count]) => ({ x: title, y: count }));
 
     return (
-        <div className="bg-white dark:bg-secondary-dark-bg rounded-3xl p-6 shadow-sm">
+        <div className="bg-gray-50/50 dark:bg-main-dark-bg min-h-screen p-6 md:p-10 text-gray-900 dark:text-white">
             <Header category="Analytics" title="Reservations & Revenue" />
 
             {/* CARDS */}

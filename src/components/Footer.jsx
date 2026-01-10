@@ -19,10 +19,7 @@ const Footer = () => {
                             Made with passion by:
                             <br />
                             <span className="font-bold text-gray-900">Boussaidi Oubaid Allah</span>
-                            <br />
-                            <span className="font-bold text-gray-900">Ben Hamad Yassine</span>
-                            <br />
-                            <span className="font-bold text-gray-900">Magouri Fares</span>
+                           
                         </p>
                         <div className="flex gap-4">
                             {[Facebook, Twitter, Instagram].map((Icon, idx) => (
