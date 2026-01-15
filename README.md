@@ -4,28 +4,59 @@ Utrip is a modern, full-stack tourism and event management platform designed to 
 
 ---
 
-## 🚀 Key Features
+## 🚀 Application Walkthrough & Features
 
-### 🏢 Administration & Management
-- **Centralized Dashboard**: A premium, high-contrast dashboard for administrators to monitor platform activity and manage users.
-- **Event Orchestration**: Comprehensive tools for creating, approving, and managing tourism events.
-- **Role-Based Access**: Secure system with distinct workflows for Admins, Organizers, and Tourists.
+### 🏠 Home & Discovery
+The entry point to the Utrip experience. The homepage features a dynamic **hero carousel** showcasing featured events. Users doesn't have to be authenticated to view the events.
+- **Event Details & Payment**: Clicking "View Details" on any event opens a comprehensive modal where users can book tickets directly using our integrated Stripe payment system.
+- **Mobile Integration**: A dedicated "Get the App" section allows users to download the Android APK directly to their devices for on-the-go access.
 
-### 📊 Organizer Insights
-- **Performance Analytics**: Real-time statistics on event reservations and revenue.
-- **Event Lifecycle Tracking**: Track event status from draft to completed.
+![Home Page](public/screenshots/home.png)
 
-### 🤖 AI-Powered Discovery
-- **Personalized Recommendations**: Machine learning engine that suggests events based on user preferences and search history.
-- **Smart Filtering**: Advanced search logic to help users find exactly what they're looking for.
+### 🗺️ Event Exploration & Mapping
+The Events page provides a powerful discovery interface.
+- **Interactive Map**: Integrated Leaflet maps show event locations with real-time distance and estimated travel time calculations from the user's location.
+- **Smart Filtering**: Users can filter events by category, date, and price range.
 
-### 🗺️ Tourist Experience
-- **Interactive Itineraries**: Plan your journey using map-based route optimization (Leaflet/OpenStreetMap).
-- **Secure Reservations**: Integrated booking system with Stripe payment processing.
-- **Modern UI**: Fully redesigned authentication modals and page layouts for a premium feel.
+<div style="display: flex; gap: 10px;">
+  <img src="public/screenshots/events.png" width="48%" />
+  <img src="public/screenshots/events_map.png" width="48%" />
+</div>
 
-### 📱 Mobile Access
-- **Android Companion App**: Native Kotlin application for on-the-go access to tickets and event discovery.
+### 🤖 AI Recommendations
+Powered by a Python/FastAPI backend, our recommendation engine analyzes user preferences and past interactions to suggest personalized events.
+- **Tailored Suggestions**: The "For You" section (Recommendations page) displays events that match the user's implicit interests.
+
+![Recommendations](public/screenshots/recommendations.png)
+
+---
+
+### 💼 Organizer Portal
+Designed for content creators and event managers.
+- **Performance Dashboard**: Organizers get a dedicated dashboard with real-time analytics on revenue, total reservations, and user engagement (favorites).
+- **Event Creation Workflow**: Organizers can create detailed events with images, locations, and pricing.
+- **Approval System**: When an event is created, it is set to `PENDING` status. A notification is automatically sent to the Admin dashboard for review and approval before it goes live.
+
+<div style="display: flex; gap: 10px;">
+  <img src="public/screenshots/organizer_stats.png" width="48%" />
+  <img src="public/screenshots/organizer_events.png" width="48%" />
+</div>
+
+---
+
+### 🛡️ Admin Administration
+The command center for platform management.
+- **Overview Dashboard**: A high-level view of platform health, including total revenue (commission based), user growth, and event distribution.
+- **Event Management**: Admins receive notifications for new pending events. They can review details and **Approve** or **Reject** them. Approved events become visible to all users; rejected ones are flagged for the organizer.
+- **User & Reservation Management**: Admins have full control over user accounts (role management) and can inspect all reservation data for support and auditing.
+
+![Admin Overview](public/screenshots/admin_overview.png)
+
+<div style="display: flex; gap: 10px; margin-top: 10px;">
+  <img src="public/screenshots/admin_events.png" width="32%" />
+  <img src="public/screenshots/admin_users.png" width="32%" />
+  <img src="public/screenshots/admin_reservations.png" width="32%" />
+</div>
 
 ---
 

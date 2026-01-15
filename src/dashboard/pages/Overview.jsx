@@ -247,8 +247,8 @@ const Overview = () => {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         {/* Status Distribution */}
         {enabledWidgets.includes('statusDist') && (
-          <div className="bg-white p-8 rounded-[2.5rem] border border-gray-100 shadow-sm">
-            <h3 className="text-xl font-bold mb-6 text-gray-800">Event Approval Status</h3>
+          <div className="bg-white dark:bg-gray-800 p-8 rounded-[2.5rem] border border-gray-100 dark:border-gray-700 shadow-sm">
+            <h3 className="text-xl font-bold mb-6 text-gray-800 dark:text-gray-200">Event Approval Status</h3>
             <div className="w-full h-[300px]">
               <AccumulationChartComponent
                 id='status-pie'
@@ -272,8 +272,8 @@ const Overview = () => {
 
         {/* Revenue Overview */}
         {enabledWidgets.includes('revenueAnalysis') && (
-          <div className="bg-white p-8 rounded-[2.5rem] border border-gray-100 shadow-sm">
-            <h3 className="text-xl font-bold mb-6 text-gray-800">Platform Revenue</h3>
+          <div className="bg-white dark:bg-gray-800 p-8 rounded-[2.5rem] border border-gray-100 dark:border-gray-700 shadow-sm">
+            <h3 className="text-xl font-bold mb-6 text-gray-800 dark:text-gray-200">Platform Revenue</h3>
             <div className="flex flex-col items-center justify-center pt-10">
               <div className="size-48 rounded-full border-[12px] border-blue-50 flex flex-col items-center justify-center">
                 <p className="text-xs font-black text-blue-400 uppercase">Commision</p>
@@ -288,8 +288,8 @@ const Overview = () => {
 
         {/* Categories Analysis */}
         {enabledWidgets.includes('categoryDist') && (
-          <div className="bg-white p-8 rounded-[2.5rem] border border-gray-100 shadow-sm lg:col-span-2">
-            <h3 className="text-xl font-bold mb-6 text-gray-800">Events per Category</h3>
+          <div className="bg-white dark:bg-gray-800 p-8 rounded-[2.5rem] border border-gray-100 dark:border-gray-700 shadow-sm lg:col-span-2">
+            <h3 className="text-xl font-bold mb-6 text-gray-800 dark:text-gray-200">Events per Category</h3>
             <div className="w-full h-[350px]">
               <ChartComponent
                 id="category-bar"
@@ -316,8 +316,8 @@ const Overview = () => {
 
         {/* User Roles */}
         {enabledWidgets.includes('userRolesDist') && (
-          <div className="bg-white p-8 rounded-[2.5rem] border border-gray-100 shadow-sm">
-            <h3 className="text-xl font-bold mb-6 text-gray-800">Community Breakdown</h3>
+          <div className="bg-white dark:bg-gray-800 p-8 rounded-[2.5rem] border border-gray-100 dark:border-gray-700 shadow-sm">
+            <h3 className="text-xl font-bold mb-6 text-gray-800 dark:text-gray-200">Community Breakdown</h3>
             <div className="w-full h-[300px]">
               <AccumulationChartComponent
                 id='user-pie'
@@ -341,8 +341,8 @@ const Overview = () => {
 
         {/* Hot Locations */}
         {enabledWidgets.includes('topLocs') && (
-          <div className="bg-white p-8 rounded-[2.5rem] border border-gray-100 shadow-sm">
-            <h3 className="text-xl font-bold mb-6 text-gray-800">Trending Locations</h3>
+          <div className="bg-white dark:bg-gray-800 p-8 rounded-[2.5rem] border border-gray-100 dark:border-gray-700 shadow-sm">
+            <h3 className="text-xl font-bold mb-6 text-gray-800 dark:text-gray-200">Trending Locations</h3>
             <div className="space-y-4 pt-4">
               {dashboardData.topLocations.map((loc, idx) => (
                 <div key={loc.x} className="flex items-center gap-4">
@@ -362,8 +362,8 @@ const Overview = () => {
 
         {/* User Growth Trend */}
         {enabledWidgets.includes('userGrowth') && (
-          <div className="bg-white p-8 rounded-[2.5rem] border border-gray-100 shadow-sm">
-            <h3 className="text-xl font-bold mb-6 text-gray-800">User Growth Trend</h3>
+          <div className="bg-white dark:bg-gray-800 p-8 rounded-[2.5rem] border border-gray-100 dark:border-gray-700 shadow-sm">
+            <h3 className="text-xl font-bold mb-6 text-gray-800 dark:text-gray-200">User Growth Trend</h3>
             <div className="w-full h-[300px]">
               <ChartComponent
                 id="growth-chart"
@@ -390,8 +390,8 @@ const Overview = () => {
 
         {/* Top Organizers List */}
         {enabledWidgets.includes('topOrgs') && (
-          <div className="bg-white p-8 rounded-[2.5rem] border border-gray-100 shadow-sm">
-            <h3 className="text-xl font-bold mb-6 text-gray-800">Top Performing Organizers</h3>
+          <div className="bg-white dark:bg-gray-800 p-8 rounded-[2.5rem] border border-gray-100 dark:border-gray-700 shadow-sm">
+            <h3 className="text-xl font-bold mb-6 text-gray-800 dark:text-gray-200">Top Performing Organizers</h3>
             <div className="space-y-4">
               {dashboardData.topOrganizers.map((org, index) => (
                 <div key={org.email} className="flex items-center justify-between p-4 bg-gray-50 rounded-2xl hover:bg-gray-100 transition-colors">
@@ -411,7 +411,8 @@ const Overview = () => {
               ))}
             </div>
           </div>
-        )}
+        )
+        }
       </div>
     </div>
   );

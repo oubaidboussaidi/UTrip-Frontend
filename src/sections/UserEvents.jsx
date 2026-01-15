@@ -333,8 +333,8 @@ const UserEvents = ({ showLoginPrompt = () => alert("Please log in to manage fav
         )}
       </div>
 
-      {/* Recommended Events Section */}
-      {isLoggedIn && recommendedEvents.length > 0 && (
+      {/* Recommended Events Section Removed as per request */}
+      {/* {isLoggedIn && recommendedEvents.length > 0 && (
         <div className="mt-16 px-5 md:px-20 mb-20">
           <div className="flex items-center gap-3 mb-6">
             <div className="p-2 bg-violet-100 rounded-lg">
@@ -392,7 +392,7 @@ const UserEvents = ({ showLoginPrompt = () => alert("Please log in to manage fav
             ))}
           </div>
         </div>
-      )}
+      )} */}
 
       {/* All events modal */}
       {showAllEventsModal && (

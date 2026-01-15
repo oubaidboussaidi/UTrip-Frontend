@@ -128,7 +128,7 @@ const OrganizerDashboard = () => {
                 <div className="transition-all duration-500">
                     {activeTab === "overview" ? (
                         <div className="space-y-10 animate-in fade-in slide-in-from-bottom-4 duration-700">
-                            <OrganizerStats organizerEmail={user?.email} embedded={true} />
+                            <OrganizerStats organizerEmail={user?.email} embedded={true} statsData={stats} />
                         </div>
                     ) : (
                         <div className="animate-in fade-in slide-in-from-bottom-4 duration-700">

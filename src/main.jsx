@@ -4,6 +4,7 @@ import ReactDOM from "react-dom";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import App from "./app.jsx";
 import DashboardApp from "./dashboard/DashboardApp.jsx";
+import { ContextProvider } from './dashboard/contexts/ContextProvider';
 
 import Overview from "./dashboard/pages/Overview"
 import EventsAdmin from "./dashboard/pages/EventsAdmin";
@@ -43,12 +44,16 @@ ReactDOM.render(
         <Route path="/my-events" element={<MyEvents />} />
         <Route path="/organizer-stats" element={
           <ProtectedRoute allowedRoles={['ORGANIZER']}>
-            <OrganizerStats />
+            <ContextProvider>
+              <OrganizerStats />
+            </ContextProvider>
           </ProtectedRoute>
         } />
         <Route path="/organizer-dashboard" element={
           <ProtectedRoute allowedRoles={['ORGANIZER']}>
-            <OrganizerDashboard />
+            <ContextProvider>
+              <OrganizerDashboard />
+            </ContextProvider>
           </ProtectedRoute>
         } />
 
