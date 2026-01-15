@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const apiReservation = axios.create({
-    baseURL: "http://localhost:8080/api/reservations",
+    baseURL: `${import.meta.env.VITE_API_URL}/reservations`,
     headers: {
         "Content-Type": "application/json",
     },

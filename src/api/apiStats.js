@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const apiStats = axios.create({
-    baseURL: "http://localhost:8080/api/stats",
+    baseURL: `${import.meta.env.VITE_API_URL}/stats`,
     headers: {
         "Content-Type": "application/json",
     },

@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const apiTicket = axios.create({
-    baseURL: "http://localhost:8080/api", // Base URL updated to /api to handle both /tickets and /ticket-types
+    baseURL: import.meta.env.VITE_API_URL, // Base URL updated to /api to handle both /tickets and /ticket-types
     headers: {
         "Content-Type": "application/json",
     },

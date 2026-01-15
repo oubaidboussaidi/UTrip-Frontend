@@ -2,7 +2,7 @@
 import axios from "axios";
 
 const apiEvent = axios.create({
-  baseURL: "http://localhost:8080/api/events", // adjust to your backend
+  baseURL: `${import.meta.env.VITE_API_URL}/events`, // adjust to your backend
   headers: {
     "Content-Type": "application/json",
   },
