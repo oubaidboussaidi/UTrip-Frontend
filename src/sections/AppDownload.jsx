@@ -21,7 +21,7 @@ const AppDownload = () => {
                     </p>
 
                     <div className="flex flex-wrap gap-4 pt-4">
-                        <a href="/app-debug.apk" download className="flex items-center gap-3 bg-black text-white px-8 py-4 rounded-2xl hover:scale-105 transition-all shadow-xl shadow-black/10">
+                        <a href="/Utrip.apk" download className="flex items-center gap-3 bg-black text-white px-8 py-4 rounded-2xl hover:scale-105 transition-all shadow-xl shadow-black/10">
                             <PlayCircle className="w-6 h-6 text-white" />
                             <div className="text-left">
                                 <p className="text-[10px] uppercase font-bold text-gray-400">Download APK</p>
