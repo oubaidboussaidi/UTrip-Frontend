@@ -9,6 +9,7 @@ export default defineConfig({
     react()
   ],
   build: {
+    outDir: 'build',
     rollupOptions: {
       input: {
         main: resolve(__dirname, 'index.html'),
