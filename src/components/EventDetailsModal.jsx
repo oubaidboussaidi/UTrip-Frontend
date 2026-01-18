@@ -345,7 +345,9 @@ const EventDetailsModal = ({ event, onClose }) => {
                 {/* Ticket Types Selector */}
                 {ticketTypes.length > 0 && (
                   <div className="mb-4">
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Select Ticket Type</label>
+                    <label className="block text-sm font-bold text-amber-800 mb-2 uppercase tracking-wide">
+                      Select Ticket Type
+                    </label>
                     <select
                       value={selectedTicketType?.id || ""}
                       onChange={(e) => {
@@ -353,10 +355,10 @@ const EventDetailsModal = ({ event, onClose }) => {
                         setSelectedTicketType(type);
                         setQuantity(1);
                       }}
-                      className="w-full p-3 border border-gray-200 rounded-xl bg-gray-50 mb-3"
+                      className="w-full p-3 border-2 border-amber-200 rounded-xl bg-amber-50 text-amber-900 font-medium focus:ring-2 focus:ring-amber-400 focus:border-amber-400 outline-none transition-all cursor-pointer shadow-sm hover:bg-amber-100"
                     >
                       {ticketTypes.map(type => (
-                        <option key={type.id} value={type.id}>
+                        <option key={type.id} value={type.id} className="bg-white text-gray-900">
                           {type.name} - {type.price} TND ({type.remainingQuantity} left)
                         </option>
                       ))}
