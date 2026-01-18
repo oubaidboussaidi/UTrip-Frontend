@@ -79,8 +79,8 @@ The command center for platform management.
 
 | Role | Email | Password |
 | :--- | :--- | :--- |
-| **Admin** | `admin@Utrip.com` | `password123` |
-| **Organizer** | `organizer@Utrip.com` | `password123` |
+| **Admin** | `admin@Utrip.com` | `Test123!` |
+| **Organizer** | `organizer@Utrip.com` | `Test123!` |
 
 ---
 
