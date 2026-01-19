@@ -1,8 +1,17 @@
 // src/api/apiEvent.js
 import axios from "axios";
 
+const getBaseUrl = () => {
+  let url = import.meta.env.VITE_API_URL || "";
+  if (url && !url.endsWith("/api")) {
+    url = url.replace(/\/+$/, "");
+    url += "/api";
+  }
+  return url;
+};
+
 const apiEvent = axios.create({
-  baseURL: `${import.meta.env.VITE_API_URL}/events`, // adjust to your backend
+  baseURL: `${getBaseUrl()}/events`, // adjust to your backend
   headers: {
     "Content-Type": "application/json",
   },
