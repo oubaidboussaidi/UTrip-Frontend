@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { Search, MapPin, Calendar, Heart, Filter, ChevronRight, SlidersHorizontal, ChevronLeft } from "lucide-react";
 import Navbar from "../components/NavBar";
-import apiPublic from "../api/apiPublic";
+
 import apiUser from "../api/apiUser";
-import { searchEvents } from "../api/apiEvent";
+import { searchEvents, getApprovedEvents, getCategories } from "../api/apiEvent";
 import EventDetailsModal from "../components/EventDetailsModal";
 import ItineraryMap from "../components/ItineraryMap";
 import { getCoordinates } from "../api/apiGeocoding";
@@ -48,7 +48,7 @@ const EventsPage = () => {
 
     const fetchCategories = async () => {
         try {
-            const { data } = await apiPublic.get("/events/categories");
+            const { data } = await getCategories();
             setCategories(data || []);
         } catch (e) {
             console.error("Error fetching categories", e);
@@ -62,7 +62,7 @@ const EventsPage = () => {
                 const { data } = await searchEvents(params);
                 setEvents(Array.isArray(data) ? data : []);
             } else {
-                const { data } = await apiPublic.get("/events/approved");
+                const { data } = await getApprovedEvents();
                 setEvents(Array.isArray(data) ? data : []);
             }
             setCurrentPage(1); // Reset to first page on new search

@@ -3,7 +3,7 @@ import Carousel from "react-material-ui-carousel";
 import { Paper } from "@mui/material";
 import { MapPin, Calendar } from "lucide-react";
 
-import apiPublic from "../api/apiPublic";
+import { getApprovedEvents } from "../api/apiEvent";
 import apiUser from "../api/apiUser";
 import { getRecommendations } from "../api/apiAI";
 import CreateEventModal from "../components/CreateEventModal";
@@ -35,7 +35,7 @@ const UserEvents = ({ showLoginPrompt = () => alert("Please log in to manage fav
 
   const fetchEvents = async () => {
     try {
-      const { data } = await apiPublic.get("/events/approved");
+      const { data } = await getApprovedEvents();
       setEvents(Array.isArray(data) ? data : []);
     } catch (e) {
       console.error("Error fetching events", e);

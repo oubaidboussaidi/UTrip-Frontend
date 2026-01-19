@@ -63,4 +63,7 @@ export const getBasicEvents = () => apiEvent.get("");
 // ✅ Public: Search events
 export const searchEvents = (params) => apiEvent.get("/search", { params });
 
+// ✅ Public: get categories
+export const getCategories = () => apiEvent.get("/categories");
+
 export default apiEvent;

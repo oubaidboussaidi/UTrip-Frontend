@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { createPortal } from "react-dom";
 import { X, Heart, ChevronLeft, ChevronRight } from "lucide-react";
-import apiPublic from "../api/apiPublic";
-import { searchEvents } from "../api/apiEvent";
+import { searchEvents, getApprovedEvents } from "../api/apiEvent";
 import EventDetailsModal from "./EventDetailsModal";
 
 const AllEventsModal = ({ onClose, userFavs, toggleFavorite }) => {
@@ -23,7 +22,7 @@ const AllEventsModal = ({ onClose, userFavs, toggleFavorite }) => {
         const { data } = await searchEvents(searchParams);
         setAllEvents(Array.isArray(data) ? data : []);
       } else {
-        const { data } = await apiPublic.get("/events/approved");
+        const { data } = await getApprovedEvents();
         setAllEvents(Array.isArray(data) ? data : []);
       }
       setCurrentPage(1);
