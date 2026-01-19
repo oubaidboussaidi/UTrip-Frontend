@@ -1,7 +1,16 @@
 import axios from "axios";
 
+const getBaseUrl = () => {
+  let url = import.meta.env.VITE_API_URL || "";
+  if (url && !url.endsWith("/api")) {
+    url = url.replace(/\/+$/, "");
+    url += "/api";
+  }
+  return url;
+};
+
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL, // your backend base URL
+  baseURL: getBaseUrl(), // your backend base URL
 });
 
 // Automatically attach the JWT if present in localStorage

@@ -1,7 +1,16 @@
 import axios from "axios";
 
+const getBaseUrl = () => {
+    let url = import.meta.env.VITE_API_URL || "";
+    if (url && !url.endsWith("/api")) {
+        url = url.replace(/\/+$/, "");
+        url += "/api";
+    }
+    return url;
+};
+
 const apiTicket = axios.create({
-    baseURL: import.meta.env.VITE_API_URL, // Base URL updated to /api to handle both /tickets and /ticket-types
+    baseURL: getBaseUrl(), // Base URL updated to /api to handle both /tickets and /ticket-types
     headers: {
         "Content-Type": "application/json",
     },
